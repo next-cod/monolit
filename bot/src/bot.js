@@ -9,7 +9,7 @@ import { join, dirname } from 'path';
 import {
   WELCOME, MENU_HINT, ABOUT, SERVICES_TEXT, PROCESS_TEXT, WORKS_TEXT, CONTACTS_TEXT,
   BRIEF_INTRO, BRIEF_QUESTIONS, BRIEF_DONE, BRIEF_CANCELLED, HELP, UNKNOWN_HINT,
-  escapeHtml,
+  BOT_DESCRIPTION, BOT_SHORT_DESCRIPTION, escapeHtml,
 } from './content.js';
 import {
   NAV, CANCEL_LABEL, navKeyboard, cancelKeyboard, siteButton,
@@ -208,12 +208,17 @@ bot.catch((err) => {
   // НЕ re-throw – grammy увидит handled error и вернёт 200
 });
 
-export async function setCommands() {
-  await bot.api.setMyCommands([
-    { command: 'start', description: 'Запустить бота' },
-    { command: 'menu', description: 'Главное меню' },
-    { command: 'brief', description: 'Обсудить проект' },
-    { command: 'contacts', description: 'Контакты' },
-    { command: 'help', description: 'Помощь' },
+// Команды + описание бота (текст в пустом чате над START) + короткое описание.
+export async function setupBot() {
+  await Promise.all([
+    bot.api.setMyCommands([
+      { command: 'start', description: 'Запустить бота' },
+      { command: 'menu', description: 'Главное меню' },
+      { command: 'brief', description: 'Обсудить проект' },
+      { command: 'contacts', description: 'Контакты' },
+      { command: 'help', description: 'Помощь' },
+    ]),
+    bot.api.setMyDescription(BOT_DESCRIPTION),
+    bot.api.setMyShortDescription(BOT_SHORT_DESCRIPTION),
   ]);
 }

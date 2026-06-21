@@ -1,5 +1,5 @@
 // Vercel serverless function – принимает обновления от Telegram через webhook.
-import { bot, setCommands } from '../bot/src/bot.js';
+import { bot, setupBot } from '../bot/src/bot.js';
 
 // Предзаполняем botInfo – grammy не вызывает getMe при каждом запросе.
 bot.botInfo = {
@@ -15,7 +15,7 @@ bot.botInfo = {
 let ready = false;
 async function ensureReady() {
   if (ready) return;
-  await setCommands().catch((e) => console.error('[webhook] setMyCommands:', e?.message));
+  await setupBot().catch((e) => console.error('[webhook] setupBot:', e?.message));
   ready = true;
 }
 
