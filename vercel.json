@@ -1,4 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "outputDirectory": "landing"
+  "outputDirectory": "landing",
+  "functions": {
+    "api/webhook.js": {
+      "maxDuration": 10
+    }
+  }
 }

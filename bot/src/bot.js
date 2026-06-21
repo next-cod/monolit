@@ -1,6 +1,6 @@
 // Telegram-бот студии «Монолит».
-// Навигация — постоянная нижняя клавиатура чата; на сообщениях только инлайн «Открыть сайт».
-// Запуск: BOT_TOKEN=... node src/bot.js   (см. README.md)
+// Этот модуль только собирает бота и экспортирует его.
+// Запуск polling → bot/src/main.js  |  Webhook (Vercel) → /api/webhook.js
 import 'dotenv/config';
 import { Bot, session, GrammyError, HttpError, InputFile } from 'grammy';
 import { createReadStream } from 'fs';
@@ -17,47 +17,70 @@ import {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const BANNER_PATH = join(__dirname, '../images/монолит баннер копия.jpg');
+const BANNER_LOCAL = join(__dirname, '../images/монолит баннер копия.jpg');
+const SITE_URL = process.env.SITE_URL || '';
 
 const DRYRUN = process.env.BOT_DRYRUN === '1';
 const token = process.env.BOT_TOKEN || (DRYRUN ? '000000:DRYRUN_DUMMY_TOKEN' : null);
-const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || null; // куда пересылать заявки (необязательно)
+export const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || null;
 
 if (!token) {
-  console.error('[Монолит-бот] Не задан BOT_TOKEN. Создайте бота у @BotFather и укажите токен в .env');
-  process.exit(1);
+  throw new Error('[Монолит-бот] BOT_TOKEN не задан. Добавьте его в переменные окружения Vercel.');
 }
 
-const bot = new Bot(token);
+export const bot = new Bot(token);
 
-// --- Сессия для диалога заявки ---
-function initialSession() {
-  return { step: null, brief: {} };
+// --- Сессия: Upstash Redis (в облаке) или память (локально) ---
+function initialSession() { return { step: null, brief: {} }; }
+
+const sessionOpts = { initial: initialSession };
+
+if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+  try {
+    const { Redis } = await import('@upstash/redis');
+    const redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    });
+    sessionOpts.storage = {
+      async read(key) { const v = await redis.get(key); return v ?? undefined; },
+      async write(key, value) { await redis.set(key, value, { ex: 86400 }); },
+      async delete(key) { await redis.del(key); },
+    };
+    if (!DRYRUN) console.log('[Монолит-бот] Сессии: Upstash Redis');
+  } catch (e) {
+    if (!DRYRUN) console.warn('[Монолит-бот] Upstash недоступен, используем память:', e?.message);
+  }
 }
-bot.use(session({ initial: initialSession }));
+
+bot.use(session(sessionOpts));
 
 const SEND_OPTS = {
   parse_mode: 'HTML',
   link_preview_options: { is_disabled: true },
 };
 
-// Ответ-раздел: текст + единственная инлайн-кнопка «Открыть сайт».
-// Нижнее меню при этом остаётся на месте (инлайн-кнопки его не трогают).
-function sectionReply(ctx, text) {
-  return ctx.reply(text, { ...SEND_OPTS, reply_markup: siteButton() });
+// Баннер: на Vercel берём из публичного URL, локально — из файла.
+function bannerSource() {
+  if (SITE_URL) return `${SITE_URL}/banner.jpg`;
+  try { return new InputFile(createReadStream(BANNER_LOCAL)); } catch { return null; }
 }
 
-// Приветствие: баннер + текст + инлайн «Открыть сайт», затем включаем нижнее меню.
 async function sendWelcome(ctx) {
   ctx.session.step = null;
   ctx.session.brief = {};
   const name = ctx.from?.first_name || '';
-  await ctx.replyWithPhoto(new InputFile(createReadStream(BANNER_PATH)), {
-    caption: WELCOME(name),
-    parse_mode: 'HTML',
-    reply_markup: siteButton(),
-  });
+  const src = bannerSource();
+  if (src) {
+    await ctx.replyWithPhoto(src, { caption: WELCOME(name), parse_mode: 'HTML', reply_markup: siteButton() });
+  } else {
+    await ctx.reply(WELCOME(name), { ...SEND_OPTS, reply_markup: siteButton() });
+  }
   await ctx.reply(MENU_HINT, { ...SEND_OPTS, reply_markup: navKeyboard() });
+}
+
+function sectionReply(ctx, text) {
+  return ctx.reply(text, { ...SEND_OPTS, reply_markup: siteButton() });
 }
 
 async function startBrief(ctx) {
@@ -85,7 +108,7 @@ async function forwardBrief(ctx, b) {
   try {
     await bot.api.sendMessage(ADMIN_CHAT_ID, summary, SEND_OPTS);
   } catch (err) {
-    console.error('[Монолит-бот] Не удалось переслать заявку администратору:', err?.message);
+    console.error('[Монолит-бот] Не удалось переслать заявку:', err?.message);
   }
 }
 
@@ -100,42 +123,24 @@ bot.command('cancel', async (ctx) => {
   else await ctx.reply('Сейчас нечего отменять. Откройте /menu.', { ...SEND_OPTS, reply_markup: navKeyboard() });
 });
 
-// --- Текстовые сообщения: ответы брифа + нижняя навигация ---
+// --- Текстовые сообщения: нижняя навигация + ответы на бриф ---
 bot.on('message:text', async (ctx) => {
   const text = ctx.message.text.trim();
   const step = ctx.session.step;
 
-  // 1) Идёт оформление заявки
   if (step) {
-    if (text === CANCEL_LABEL) {
-      await cancelBrief(ctx);
-      return;
-    }
+    if (text === CANCEL_LABEL) { await cancelBrief(ctx); return; }
     if (text.startsWith('/')) {
       await ctx.reply(`Идёт оформление заявки. Ответьте на вопрос, нажмите «${CANCEL_LABEL}» или /cancel.`, SEND_OPTS);
       return;
     }
-    if (text.length > 1500) {
-      await ctx.reply('Слишком длинный ответ — попробуйте короче (до 1500 символов).', SEND_OPTS);
-      return;
-    }
-    if (step === 'name') {
-      ctx.session.brief.name = text;
-      ctx.session.step = 'task';
-      await ctx.reply(BRIEF_QUESTIONS.task, SEND_OPTS);
-      return;
-    }
-    if (step === 'task') {
-      ctx.session.brief.task = text;
-      ctx.session.step = 'contact';
-      await ctx.reply(BRIEF_QUESTIONS.contact, SEND_OPTS);
-      return;
-    }
+    if (text.length > 1500) { await ctx.reply('Слишком длинный ответ — попробуйте короче (до 1500 символов).', SEND_OPTS); return; }
+    if (step === 'name') { ctx.session.brief.name = text; ctx.session.step = 'task'; await ctx.reply(BRIEF_QUESTIONS.task, SEND_OPTS); return; }
+    if (step === 'task') { ctx.session.brief.task = text; ctx.session.step = 'contact'; await ctx.reply(BRIEF_QUESTIONS.contact, SEND_OPTS); return; }
     if (step === 'contact') {
       ctx.session.brief.contact = text;
       const b = ctx.session.brief;
-      ctx.session.step = null;
-      ctx.session.brief = {};
+      ctx.session.step = null; ctx.session.brief = {};
       await ctx.reply(BRIEF_DONE, { ...SEND_OPTS, reply_markup: navKeyboard() });
       await forwardBrief(ctx, b);
       return;
@@ -143,7 +148,6 @@ bot.on('message:text', async (ctx) => {
     return;
   }
 
-  // 2) Нижняя навигация — кнопки присылают свой текст
   switch (text) {
     case NAV.services: return sectionReply(ctx, SERVICES_TEXT);
     case NAV.process: return sectionReply(ctx, PROCESS_TEXT);
@@ -154,41 +158,33 @@ bot.on('message:text', async (ctx) => {
     default: break;
   }
 
-  // 3) Прочий текст — мягкая подсказка
   await ctx.reply(UNKNOWN_HINT, { ...SEND_OPTS, reply_markup: siteButton() });
 });
 
-// Нетекстовые сообщения (стикеры, фото и т.п.)
+// Нетекстовые сообщения
 bot.on('message', (ctx) => ctx.reply(UNKNOWN_HINT, { ...SEND_OPTS, reply_markup: siteButton() }));
 
-// Совместимость со старыми инлайн-кнопками, если они остались в истории чатов
+// Совместимость со старыми инлайн-кнопками из истории чатов
 bot.on('callback_query:data', async (ctx) => {
   const d = ctx.callbackQuery.data;
   await ctx.answerCallbackQuery();
-  const map = {
-    services: SERVICES_TEXT, process: PROCESS_TEXT, works: WORKS_TEXT,
-    about: ABOUT, contacts: CONTACTS_TEXT,
-  };
+  const map = { services: SERVICES_TEXT, process: PROCESS_TEXT, works: WORKS_TEXT, about: ABOUT, contacts: CONTACTS_TEXT };
   if (map[d]) return sectionReply(ctx, map[d]);
   if (d === 'brief') return startBrief(ctx);
   return sendWelcome(ctx);
 });
 
-// --- Глобальная обработка ошибок, чтобы бот не падал ---
+// Глобальный перехват ошибок
 bot.catch((err) => {
   const ctx = err.ctx;
   const e = err.error;
   const where = ctx?.update?.update_id ?? '?';
-  if (e instanceof GrammyError) {
-    console.error(`[Монолит-бот] Ошибка запроса к Telegram (update ${where}):`, e.description);
-  } else if (e instanceof HttpError) {
-    console.error(`[Монолит-бот] Сетевая ошибка (update ${where}):`, e);
-  } else {
-    console.error(`[Монолит-бот] Непредвиденная ошибка (update ${where}):`, e);
-  }
+  if (e instanceof GrammyError) console.error(`[Монолит-бот] Ошибка Telegram (update ${where}):`, e.description);
+  else if (e instanceof HttpError) console.error(`[Монолит-бот] Сетевая ошибка (update ${where}):`, e);
+  else console.error(`[Монолит-бот] Непредвиденная ошибка (update ${where}):`, e);
 });
 
-async function setCommands() {
+export async function setCommands() {
   await bot.api.setMyCommands([
     { command: 'start', description: 'Запустить бота' },
     { command: 'menu', description: 'Главное меню' },
@@ -197,14 +193,3 @@ async function setCommands() {
     { command: 'help', description: 'Помощь' },
   ]);
 }
-
-if (DRYRUN) {
-  console.log('[Монолит-бот] Dry run: модуль загружен, обработчики зарегистрированы. Запуск пропущен.');
-} else {
-  setCommands().catch((e) => console.error('[Монолит-бот] setMyCommands:', e?.message));
-  bot.start({
-    onStart: (info) => console.log(`[Монолит-бот] Запущен как @${info.username}`),
-  });
-}
-
-export { bot };

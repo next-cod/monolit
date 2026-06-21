@@ -4,18 +4,19 @@
   "description": "Telegram-бот студии бренд-стратегии «Монолит»",
   "type": "module",
   "private": true,
-  "main": "src/bot.js",
+  "main": "src/main.js",
   "scripts": {
-    "start": "node src/bot.js",
-    "dev": "node --watch src/bot.js",
-    "check": "node --check src/bot.js && node --check src/content.js && node --check src/keyboards.js",
-    "dryrun": "node src/bot.js"
+    "start": "node src/main.js",
+    "dev": "node --watch src/main.js",
+    "check": "node --check src/bot.js && node --check src/main.js && node --check src/content.js && node --check src/keyboards.js",
+    "dryrun": "BOT_DRYRUN=1 node src/bot.js"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
-    "grammy": "^1.30.0"
+    "grammy": "^1.30.0",
+    "@upstash/redis": "^1.34.0"
   }
 }
