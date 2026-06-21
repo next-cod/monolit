@@ -2,7 +2,7 @@
 import { webhookCallback } from 'grammy';
 import { bot, setCommands } from '../bot/src/bot.js';
 
-// Предзаполняем botInfo — grammy не будет вызывать getMe при каждом запросе.
+// Предзаполняем botInfo — grammy не вызывает getMe при каждом запросе.
 bot.botInfo = {
   id: 8690154690,
   is_bot: true,
@@ -13,8 +13,12 @@ bot.botInfo = {
   supports_inline_queries: false,
 };
 
-// Регистрируем команды один раз при холодном старте.
-setCommands().catch((e) => console.error('[webhook] setMyCommands:', e?.message));
+let ready = false;
+async function ensureReady() {
+  if (ready) return;
+  await setCommands().catch((e) => console.error('[webhook] setMyCommands:', e?.message));
+  ready = true;
+}
 
 const handle = webhookCallback(bot, 'http');
 
@@ -23,5 +27,12 @@ export default async function handler(req, res) {
     res.status(200).send('Monolit bot webhook OK');
     return;
   }
-  return handle(req, res);
+  try {
+    await ensureReady();
+    await handle(req, res);
+  } catch (e) {
+    // Возвращаем 200 чтобы Telegram не ретраил проблемные апдейты.
+    console.error('[webhook] Uncaught error:', e?.message);
+    if (!res.headersSent) res.status(200).json({ ok: false });
+  }
 }

@@ -186,14 +186,20 @@ bot.on('callback_query:data', async (ctx) => {
   return sendWelcome(ctx);
 });
 
-// Глобальный перехват ошибок
+// Глобальный перехват ошибок — логируем, НЕ бросаем (иначе grammy вернёт 500)
 bot.catch((err) => {
   const ctx = err.ctx;
   const e = err.error;
   const where = ctx?.update?.update_id ?? '?';
-  if (e instanceof GrammyError) console.error(`[Монолит-бот] Ошибка Telegram (update ${where}):`, e.description);
-  else if (e instanceof HttpError) console.error(`[Монолит-бот] Сетевая ошибка (update ${where}):`, e);
-  else console.error(`[Монолит-бот] Непредвиденная ошибка (update ${where}):`, e);
+  const chat = ctx?.chat?.id ?? '?';
+  if (e instanceof GrammyError) {
+    console.error(`[bot] GrammyError (update=${where}, chat=${chat}): ${e.description} | method=${e.method}`);
+  } else if (e instanceof HttpError) {
+    console.error(`[bot] HttpError (update=${where}):`, e.message);
+  } else {
+    console.error(`[bot] Error (update=${where}):`, e?.message ?? e);
+  }
+  // НЕ re-throw — grammy увидит handled error и вернёт 200
 });
 
 export async function setCommands() {
