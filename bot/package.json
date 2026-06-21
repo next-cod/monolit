@@ -1,0 +1,21 @@
+{
+  "name": "monolit-bot",
+  "version": "1.0.0",
+  "description": "Telegram-бот студии бренд-стратегии «Монолит»",
+  "type": "module",
+  "private": true,
+  "main": "src/bot.js",
+  "scripts": {
+    "start": "node src/bot.js",
+    "dev": "node --watch src/bot.js",
+    "check": "node --check src/bot.js && node --check src/content.js && node --check src/keyboards.js",
+    "dryrun": "node src/bot.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "grammy": "^1.30.0"
+  }
+}
