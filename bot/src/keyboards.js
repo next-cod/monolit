@@ -1,46 +1,38 @@
-// Инлайн-клавиатуры бота. На кнопках эмодзи не используем — только текст.
-import { InlineKeyboard } from 'grammy';
-import { SITE_URL, CONTACTS } from './content.js';
+// Клавиатуры бота.
+// Навигация — постоянная клавиатура внизу чата (reply keyboard): кнопки шлют свой текст.
+// На самих сообщениях — единственная инлайн-кнопка «Открыть сайт». Эмодзи на кнопках не используем.
+import { Keyboard, InlineKeyboard } from 'grammy';
+import { SITE_URL } from './content.js';
 
-export function mainMenu() {
-  return new InlineKeyboard()
-    .text('Услуги', 'services')
-    .text('Процесс', 'process')
-    .row()
-    .text('Работы', 'works')
-    .text('О студии', 'about')
-    .row()
-    .text('Обсудить проект', 'brief')
-    .row()
-    .text('Контакты', 'contacts')
-    .row()
-    .url('Открыть сайт', SITE_URL);
+// Подписи кнопок нижней навигации (они же приходят боту как текст сообщения).
+export const NAV = {
+  services: 'Услуги',
+  process: 'Процесс',
+  works: 'Работы',
+  about: 'О студии',
+  contacts: 'Контакты',
+  brief: 'Обсудить проект',
+};
+
+// Кнопка отмены во время заполнения заявки.
+export const CANCEL_LABEL = 'Отменить заявку';
+
+// Постоянная нижняя навигация (3 ряда по 2 кнопки).
+export function navKeyboard() {
+  return new Keyboard()
+    .text(NAV.services).text(NAV.process).row()
+    .text(NAV.works).text(NAV.about).row()
+    .text(NAV.contacts).text(NAV.brief).row()
+    .resized()
+    .persistent();
 }
 
-// Клавиатура для внутренних разделов: действие + назад.
-export function sectionMenu() {
-  return new InlineKeyboard()
-    .text('Обсудить проект', 'brief')
-    .row()
-    .text('Назад в меню', 'menu');
+// Клавиатура на время брифа — только отмена.
+export function cancelKeyboard() {
+  return new Keyboard().text(CANCEL_LABEL).resized().persistent();
 }
 
-export function backMenu() {
-  return new InlineKeyboard().text('Назад в меню', 'menu');
-}
-
-export function contactsMenu() {
-  return new InlineKeyboard()
-    .url('Написать на почту', `mailto:${CONTACTS.email}`)
-    .row()
-    .text('Обсудить проект', 'brief')
-    .row()
-    .text('Назад в меню', 'menu');
-}
-
-export function afterBriefMenu() {
-  return new InlineKeyboard()
-    .url('Открыть сайт', SITE_URL)
-    .row()
-    .text('В меню', 'menu');
+// Единственная инлайн-кнопка на сообщениях — открыть сайт.
+export function siteButton() {
+  return new InlineKeyboard().url('Открыть сайт', SITE_URL);
 }

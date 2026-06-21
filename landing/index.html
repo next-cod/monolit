@@ -46,8 +46,10 @@
   @media (max-width: 760px) {
     /* horizontal padding ladder (applies to every section incl. #works) */
     [data-pad] { padding-left: 22px !important; padding-right: 22px !important; }
-    /* vertical rhythm */
-    #top { padding-top: 92px !important; padding-bottom: 32px !important; min-height: auto !important; }
+    /* vertical rhythm + breathing room so the hero never feels cramped */
+    #top { padding-top: 96px !important; padding-bottom: 44px !important; min-height: auto !important; gap: 38px !important; justify-content: flex-start !important; }
+    /* smaller, quieter eyebrow row */
+    #top > div:first-of-type span { font-size: 11px !important; letter-spacing: 0.14em !important; }
     #about, #works { padding-top: 72px !important; padding-bottom: 72px !important; }
     #services, #process { padding-top: 32px !important; padding-bottom: 72px !important; }
     #contact { padding-top: 80px !important; padding-bottom: 80px !important; }
@@ -86,8 +88,8 @@
   @media (max-width: 430px) {
     [data-hero-title] { font-size: clamp(30px, 9vw, 40px) !important; }
     [data-nav-links] a[href='#process'], [data-nav-links] a[href='#works'] { display: none !important; }
-    #top > div:first-of-type { flex-direction: column !important; gap: 10px; }
-    #top > div:first-of-type span:last-child { text-align: left !important; }
+    #top > div:first-of-type { flex-direction: column !important; align-items: flex-start !important; gap: 6px !important; }
+    #top > div:first-of-type span { font-size: 10px !important; letter-spacing: 0.13em !important; text-align: left !important; }
   }
 
   /* ---- touch devices: reveal hover-only content + hide scroll hint regardless of width ---- */
@@ -122,7 +124,7 @@
   <section id="top" data-pad style="min-height:100vh; padding:120px 56px 40px; display:flex; flex-direction:column; justify-content:space-between; position:relative;">
     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
       <span data-fade style="font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; letter-spacing:0.18em; text-transform:uppercase; color:#7A756B;">(01) — Студия бренд-стратегии</span>
-      <span data-fade data-delay="120" style="font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; letter-spacing:0.18em; text-transform:uppercase; color:#7A756B; text-align:right;">Москва<br>с 2016</span>
+      <span data-fade data-delay="120" style="font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; letter-spacing:0.18em; text-transform:uppercase; color:#7A756B; text-align:right;">Москва · с 2016</span>
     </div>
 
     <div style="position:relative;">
