@@ -1,7 +1,7 @@
-// Vercel serverless function — принимает обновления от Telegram через webhook.
+// Vercel serverless function – принимает обновления от Telegram через webhook.
 import { bot, setCommands } from '../bot/src/bot.js';
 
-// Предзаполняем botInfo — grammy не вызывает getMe при каждом запросе.
+// Предзаполняем botInfo – grammy не вызывает getMe при каждом запросе.
 bot.botInfo = {
   id: 8690154690,
   is_bot: true,
@@ -20,7 +20,7 @@ async function ensureReady() {
 }
 
 export default async function handler(req, res) {
-  // GET — health-check (без раскрытия секретов)
+  // GET – health-check (без раскрытия секретов)
   if (req.method !== 'POST') {
     const health = {
       ok: true,
@@ -41,7 +41,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  // POST — обработка обновления от Telegram
+  // POST – обработка обновления от Telegram
   let raw = '';
   for await (const chunk of req) raw += chunk;
 

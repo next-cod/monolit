@@ -7,20 +7,20 @@
 
 ```
 monolit/
-  landing/   — сайт студии (статический, адаптивный)
-  bot/       — Telegram-бот студии
+  landing/   – сайт студии (статический, адаптивный)
+  bot/       – Telegram-бот студии
 ```
 
-## landing — сайт
+## landing – сайт
 
 Одностраничный адаптивный сайт. Деплоится на Vercel из папки `landing`
 (см. `vercel.json`).
 
 - Прод: https://monolit-pi.vercel.app
 
-## bot — Telegram-бот
+## bot – Telegram-бот
 
 Бот-витрина: услуги, процесс, работы, контакты и заявка на проект.
-Подробности и запуск — в [`bot/README.md`](bot/README.md).
+Подробности и запуск – в [`bot/README.md`](bot/README.md).
 
 Рекомендуемый username бота: **@monolit_studio_bot**.

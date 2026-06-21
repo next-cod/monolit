@@ -1,5 +1,5 @@
 // Локальная симуляция: прогоняем апдейты через бота, перехватывая вызовы Telegram API.
-// Проверяет команды, нижнюю навигацию (текстом), диалог заявки и совместимость —
+// Проверяет команды, нижнюю навигацию (текстом), диалог заявки и совместимость –
 // без сети и без токена.
 process.env.BOT_DRYRUN = '1';
 process.env.ADMIN_CHAT_ID = '999'; // чтобы проверить ветку пересылки заявки
@@ -90,13 +90,17 @@ const navSet = navKeyboards.length > 0;
 const navButtons = navKeyboards.flatMap((c) => c.payload.reply_markup.keyboard.flat().map((b) => (typeof b === 'string' ? b : b.text)));
 const navHasEmoji = navButtons.some((t) => EMOJI.test(t));
 
-// 4) на сообщениях-разделах единственная инлайн-кнопка — «Открыть сайт» (url)
+// 4) инлайн-кнопка «Открыть сайт» — ТОЛЬКО в приветствии (sendPhoto), не на разделах
 const inlineMsgs = calls.filter((c) => Array.isArray(c.payload.reply_markup?.inline_keyboard));
 const siteOnly = inlineMsgs.every((c) => {
-  const rows = c.payload.reply_markup.inline_keyboard;
-  const btns = rows.flat();
+  const btns = c.payload.reply_markup.inline_keyboard.flat();
   return btns.length === 1 && btns[0].text === 'Открыть сайт' && typeof btns[0].url === 'string';
 });
+const siteOnlyOnWelcome = inlineMsgs.every((c) => c.method === 'sendPhoto');
+// тексты разделов не должны нести инлайн-кнопок
+const sectionRe = /<b>(Услуги|Как мы работаем|Избранные работы|О студии|Контакты|Чем может помочь)/;
+const sectionMsgs = calls.filter((c) => c.method === 'sendMessage' && sectionRe.test(c.payload.text || ''));
+const sectionsNoButton = sectionMsgs.every((c) => !c.payload.reply_markup?.inline_keyboard);
 
 // 5) совместимость со старыми callback-кнопками
 const answeredCbs = calls.filter((c) => c.method === 'answerCallbackQuery').length;
@@ -106,7 +110,9 @@ console.log('заявка переслана админу:      ', briefDelivere
 console.log('баннер отправлен на /start:    ', bannerSent);
 console.log('нижнее меню включено:          ', navSet, `(сообщений с ним: ${navKeyboards.length})`);
 console.log('кнопки меню без эмодзи:        ', !navHasEmoji, `[${[...new Set(navButtons)].join(', ')}]`);
-console.log('инлайн = только «Открыть сайт»:', siteOnly, `(таких сообщений: ${inlineMsgs.length})`);
+console.log('инлайн = только «Открыть сайт»:', siteOnly, `(инлайн-сообщений: ${inlineMsgs.length})`);
+console.log('инлайн только в приветствии:   ', siteOnlyOnWelcome);
+console.log('разделы без кнопок:            ', sectionsNoButton, `(разделов: ${sectionMsgs.length})`);
 console.log('старые callback подтверждены:  ', answeredCbs, '(ожидалось 1)');
 console.log('ошибок выполнения:             ', errors.length);
 
@@ -116,7 +122,9 @@ if (!briefDelivered) fails.push('заявка не доставлена адми
 if (!bannerSent) fails.push('баннер не отправлен');
 if (!navSet) fails.push('нижнее меню не включено');
 if (navHasEmoji) fails.push('на кнопках меню есть эмодзи');
-if (!siteOnly) fails.push('на сообщении есть лишние инлайн-кнопки');
+if (!siteOnly) fails.push('инлайн-кнопка не равна одной «Открыть сайт»');
+if (!siteOnlyOnWelcome) fails.push('инлайн-кнопка появилась не только в приветствии');
+if (!sectionsNoButton) fails.push('на разделе осталась инлайн-кнопка');
 if (answeredCbs !== 1) fails.push('старый callback не подтверждён');
 
 if (fails.length) { console.log('\nFAIL:\n- ' + fails.join('\n- ')); process.exit(1); }

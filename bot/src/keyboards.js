@@ -1,6 +1,6 @@
 // Клавиатуры бота.
-// Навигация — постоянная клавиатура внизу чата (reply keyboard): кнопки шлют свой текст.
-// На самих сообщениях — единственная инлайн-кнопка «Открыть сайт». Эмодзи на кнопках не используем.
+// Навигация – постоянная клавиатура внизу чата (reply keyboard): кнопки шлют свой текст.
+// На самих сообщениях – единственная инлайн-кнопка «Открыть сайт». Эмодзи на кнопках не используем.
 import { Keyboard, InlineKeyboard } from 'grammy';
 import { SITE_URL } from './content.js';
 
@@ -27,12 +27,12 @@ export function navKeyboard() {
     .persistent();
 }
 
-// Клавиатура на время брифа — только отмена.
+// Клавиатура на время брифа – только отмена.
 export function cancelKeyboard() {
   return new Keyboard().text(CANCEL_LABEL).resized().persistent();
 }
 
-// Единственная инлайн-кнопка на сообщениях — открыть сайт.
+// Единственная инлайн-кнопка на сообщениях – открыть сайт.
 export function siteButton() {
   return new InlineKeyboard().url('Открыть сайт', SITE_URL);
 }

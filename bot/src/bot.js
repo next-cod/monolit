@@ -87,7 +87,7 @@ async function sendWelcome(ctx) {
     try {
       await ctx.replyWithPhoto(src, { caption: WELCOME(name), parse_mode: 'HTML', reply_markup: siteButton() });
     } catch {
-      // Фото не прошло — отправляем текст
+      // Фото не прошло – отправляем текст
       await ctx.reply(WELCOME(name), { ...SEND_OPTS, reply_markup: siteButton() });
     }
   } else {
@@ -97,7 +97,8 @@ async function sendWelcome(ctx) {
 }
 
 function sectionReply(ctx, text) {
-  return ctx.reply(text, { ...SEND_OPTS, reply_markup: siteButton() });
+  // Кнопку «Открыть сайт» показываем только в приветствии. Навигация — в нижнем меню.
+  return ctx.reply(text, SEND_OPTS);
 }
 
 async function startBrief(ctx) {
@@ -115,7 +116,7 @@ async function cancelBrief(ctx, msg = BRIEF_CANCELLED) {
 async function forwardBrief(ctx, b) {
   if (!ADMIN_CHAT_ID) return;
   const u = ctx.from;
-  const handle = u?.username ? `@${u.username}` : '—';
+  const handle = u?.username ? `@${u.username}` : '–';
   const summary =
     `<b>Новая заявка ✦</b>\n\n` +
     `<b>Имя / компания:</b> ${escapeHtml(b.name)}\n` +
@@ -151,7 +152,7 @@ bot.on('message:text', async (ctx) => {
       await ctx.reply(`Идёт оформление заявки. Ответьте на вопрос, нажмите «${CANCEL_LABEL}» или /cancel.`, SEND_OPTS);
       return;
     }
-    if (text.length > 1500) { await ctx.reply('Слишком длинный ответ — попробуйте короче (до 1500 символов).', SEND_OPTS); return; }
+    if (text.length > 1500) { await ctx.reply('Слишком длинный ответ – попробуйте короче (до 1500 символов).', SEND_OPTS); return; }
     if (step === 'name') { ctx.session.brief.name = text; ctx.session.step = 'task'; await ctx.reply(BRIEF_QUESTIONS.task, SEND_OPTS); return; }
     if (step === 'task') { ctx.session.brief.task = text; ctx.session.step = 'contact'; await ctx.reply(BRIEF_QUESTIONS.contact, SEND_OPTS); return; }
     if (step === 'contact') {
@@ -175,11 +176,11 @@ bot.on('message:text', async (ctx) => {
     default: break;
   }
 
-  await ctx.reply(UNKNOWN_HINT, { ...SEND_OPTS, reply_markup: siteButton() });
+  await ctx.reply(UNKNOWN_HINT, SEND_OPTS);
 });
 
 // Нетекстовые сообщения
-bot.on('message', (ctx) => ctx.reply(UNKNOWN_HINT, { ...SEND_OPTS, reply_markup: siteButton() }));
+bot.on('message', (ctx) => ctx.reply(UNKNOWN_HINT, SEND_OPTS));
 
 // Совместимость со старыми инлайн-кнопками из истории чатов
 bot.on('callback_query:data', async (ctx) => {
@@ -191,7 +192,7 @@ bot.on('callback_query:data', async (ctx) => {
   return sendWelcome(ctx);
 });
 
-// Глобальный перехват ошибок — логируем, НЕ бросаем (иначе grammy вернёт 500)
+// Глобальный перехват ошибок – логируем, НЕ бросаем (иначе grammy вернёт 500)
 bot.catch((err) => {
   const ctx = err.ctx;
   const e = err.error;
@@ -204,7 +205,7 @@ bot.catch((err) => {
   } else {
     console.error(`[bot] Error (update=${where}):`, e?.message ?? e);
   }
-  // НЕ re-throw — grammy увидит handled error и вернёт 200
+  // НЕ re-throw – grammy увидит handled error и вернёт 200
 });
 
 export async function setCommands() {
