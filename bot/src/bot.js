@@ -60,17 +60,29 @@ const SEND_OPTS = {
   link_preview_options: { is_disabled: true },
 };
 
-// Баннер: на Vercel берём из публичного URL, локально — из файла.
-function bannerSource() {
-  if (SITE_URL) return `${SITE_URL}/banner.jpg`;
-  try { return new InputFile(createReadStream(BANNER_LOCAL)); } catch { return null; }
+// Баннер: скачиваем через fetch (работает и на Vercel и локально через URL).
+// Telegram иногда не может сам скачать файл с Vercel CDN, поэтому отправляем как multipart.
+async function getBanner() {
+  try {
+    const url = SITE_URL ? `${SITE_URL}/banner.jpg` : null;
+    if (url) {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const buf = Buffer.from(await res.arrayBuffer());
+      return new InputFile(buf, 'banner.jpg');
+    }
+    return new InputFile(createReadStream(BANNER_LOCAL));
+  } catch (e) {
+    if (!DRYRUN) console.warn('[Монолит-бот] Баннер недоступен:', e?.message);
+    return null;
+  }
 }
 
 async function sendWelcome(ctx) {
   ctx.session.step = null;
   ctx.session.brief = {};
   const name = ctx.from?.first_name || '';
-  const src = bannerSource();
+  const src = await getBanner();
   if (src) {
     await ctx.replyWithPhoto(src, { caption: WELCOME(name), parse_mode: 'HTML', reply_markup: siteButton() });
   } else {
