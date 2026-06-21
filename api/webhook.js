@@ -1,5 +1,4 @@
 // Vercel serverless function — принимает обновления от Telegram через webhook.
-import { webhookCallback } from 'grammy';
 import { bot, setCommands } from '../bot/src/bot.js';
 
 // Предзаполняем botInfo — grammy не вызывает getMe при каждом запросе.
@@ -20,19 +19,31 @@ async function ensureReady() {
   ready = true;
 }
 
-const handle = webhookCallback(bot, 'http');
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(200).send('Monolit bot webhook OK');
     return;
   }
+
+  // Читаем тело вручную из потока (Vercel не парсит автоматически).
+  let raw = '';
+  for await (const chunk of req) raw += chunk;
+
+  let update;
+  try {
+    update = JSON.parse(raw);
+  } catch (e) {
+    console.error('[webhook] JSON parse error:', e?.message, '| body:', raw.slice(0, 80));
+    res.status(200).json({ ok: false, error: 'json_parse' });
+    return;
+  }
+
   try {
     await ensureReady();
-    await handle(req, res);
+    await bot.handleUpdate(update);
   } catch (e) {
-    // Возвращаем 200 чтобы Telegram не ретраил проблемные апдейты.
-    console.error('[webhook] Uncaught error:', e?.message);
-    if (!res.headersSent) res.status(200).json({ ok: false });
+    console.error('[webhook] handleUpdate error:', e?.message);
   }
+
+  if (!res.headersSent) res.status(200).json({ ok: true });
 }
