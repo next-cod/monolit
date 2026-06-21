@@ -20,28 +20,24 @@ async function ensureReady() {
 }
 
 export default async function handler(req, res) {
-  // GET — диагностика: проверяем токен и окружение
+  // GET — health-check (без раскрытия секретов)
   if (req.method !== 'POST') {
-    const t = process.env.BOT_TOKEN || '';
-    const diag = {
+    const health = {
       ok: true,
+      service: 'monolit-bot webhook',
       env: {
-        BOT_TOKEN_present: !!t,
-        BOT_TOKEN_len: t.length,
-        BOT_TOKEN_head: t.slice(0, 10),
-        BOT_TOKEN_tail: t.slice(-4),
-        SITE_URL: process.env.SITE_URL || null,
-        UPSTASH_URL_present: !!process.env.UPSTASH_REDIS_REST_URL,
-        UPSTASH_TOKEN_present: !!process.env.UPSTASH_REDIS_REST_TOKEN,
+        bot_token: !!process.env.BOT_TOKEN,
+        site_url: !!process.env.SITE_URL,
+        upstash: !!process.env.UPSTASH_REDIS_REST_URL && !!process.env.UPSTASH_REDIS_REST_TOKEN,
       },
     };
     try {
       const me = await bot.api.getMe();
-      diag.getMe = { ok: true, username: me.username };
+      health.bot = { ok: true, username: me.username };
     } catch (e) {
-      diag.getMe = { ok: false, error: e?.message };
+      health.bot = { ok: false, error: e?.message };
     }
-    res.status(200).json(diag);
+    res.status(200).json(health);
     return;
   }
 
