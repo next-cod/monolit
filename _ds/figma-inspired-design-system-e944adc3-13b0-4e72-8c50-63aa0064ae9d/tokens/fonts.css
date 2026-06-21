@@ -1,0 +1,12 @@
+/* ============================================================
+   Fonts
+   ------------------------------------------------------------
+   figmaSans / figmaMono are Figma's proprietary typefaces and
+   are NOT available here. Per the source DESIGN.md's own
+   recommendation, we substitute:
+     figmaSans  ->  Inter        (fine-grained variable weight axis)
+     figmaMono  ->  JetBrains Mono
+   Loaded from Google Fonts. Replace with the licensed binaries
+   via @font-face if you have them.
+   ============================================================ */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap");

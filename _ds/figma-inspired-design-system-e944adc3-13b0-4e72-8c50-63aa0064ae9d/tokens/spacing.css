@@ -1,0 +1,38 @@
+/* ============================================================
+   Spacing, radius & elevation
+   8px base unit. Shadow-light system — color blocks carry depth.
+   ============================================================ */
+:root {
+  /* --- Spacing scale (base 8px) --- */
+  --space-hair: 1px;
+  --space-xxs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-xxl: 48px;
+  --space-section: 96px;   /* vertical rhythm between major sections */
+
+  /* --- Layout --- */
+  --container-max: 1280px;
+  --gutter-desktop: 48px;
+  --gutter-mobile: 24px;
+  --nav-height: 56px;
+  --marquee-height: 36px;
+
+  /* --- Border radius --- */
+  --radius-xs: 2px;        /* link/anchor decoration */
+  --radius-sm: 6px;        /* chips, sub-nav tabs */
+  --radius-md: 8px;        /* inputs, list items, image frames */
+  --radius-lg: 24px;       /* cards, color blocks, large images */
+  --radius-xl: 32px;       /* hero feature panels */
+  --radius-pill: 50px;     /* all text CTAs */
+  --radius-full: 9999px;   /* circular icon buttons, glyphs */
+
+  /* --- Elevation (used sparingly) --- */
+  --elevation-0: none;
+  --elevation-1: 0 0 0 1px var(--hairline);                 /* hairline frame */
+  --elevation-2: 0 4px 16px rgba(0, 0, 0, 0.06);            /* floating tile */
+  --elevation-3: 0 16px 48px rgba(0, 0, 0, 0.18);           /* modal / lightbox */
+}

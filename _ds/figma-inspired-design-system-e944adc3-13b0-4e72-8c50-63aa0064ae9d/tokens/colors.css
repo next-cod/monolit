@@ -1,0 +1,57 @@
+/* ============================================================
+   Colors
+   Monochrome system core + oversized pastel color blocks.
+   ============================================================ */
+:root {
+  /* --- Brand core (monochrome) --- */
+  --color-black: #000000;
+  --color-white: #ffffff;
+
+  /* --- Ink & canvas roles --- */
+  --ink: #000000;              /* all text on light surfaces */
+  --canvas: #ffffff;           /* default page background */
+  --inverse-canvas: #000000;   /* footer, marquee strip, dark sections */
+  --inverse-ink: #ffffff;      /* text on dark surfaces */
+  --on-inverse-soft: #ffffff;  /* base for translucent icon buttons on dark */
+
+  /* --- Hairlines & soft surfaces --- */
+  --hairline: #e6e6e6;         /* 1px borders: inputs, cards, dividers */
+  --hairline-soft: #f1f1f1;    /* subtler dividers: table rows, footer rules */
+  --surface-soft: #f7f7f5;     /* off-white tiles: icon buttons, template cards */
+
+  /* --- Color blocks (signature pastels) --- */
+  --block-lime: #dceeb1;       /* systems / FAQ / contact form */
+  --block-lilac: #c5b0f4;      /* design hero, promo banner */
+  --block-cream: #f4ecd6;      /* FigJam hero, template grid */
+  --block-pink: #efd4d4;       /* FigJam pastel section */
+  --block-mint: #c8e6cd;       /* FigJam pastel section */
+  --block-coral: #f3c9b6;      /* "ship products" story block */
+  --block-navy: #1f1d3d;       /* deep indigo story block (inverse) */
+
+  /* --- Accent & semantic --- */
+  --accent-magenta: #ff3d8b;   /* single-shot promo CTA only */
+  --success: #1ea64a;          /* comparison checkmarks (glyph fill) */
+  --overlay-scrim: rgba(0, 0, 0, 0.6); /* modal / lightbox backdrop */
+  --on-inverse-soft-16: rgba(255, 255, 255, 0.16); /* translucent icon btn on dark */
+
+  /* ========================================================
+     Semantic aliases — prefer these in components
+     ======================================================== */
+  --text-body: var(--ink);
+  --text-strong: var(--ink);
+  --text-inverse: var(--inverse-ink);
+
+  --surface-page: var(--canvas);
+  --surface-card: var(--canvas);
+  --surface-tile: var(--surface-soft);
+  --surface-inverse: var(--inverse-canvas);
+
+  --border-hairline: var(--hairline);
+  --border-hairline-soft: var(--hairline-soft);
+
+  --cta-bg: var(--color-black);
+  --cta-fg: var(--color-white);
+  --cta-secondary-bg: var(--canvas);
+  --cta-secondary-fg: var(--ink);
+  --cta-promo-bg: var(--accent-magenta);
+}
