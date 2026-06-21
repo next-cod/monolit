@@ -20,12 +20,32 @@ async function ensureReady() {
 }
 
 export default async function handler(req, res) {
+  // GET — диагностика: проверяем токен и окружение
   if (req.method !== 'POST') {
-    res.status(200).send('Monolit bot webhook OK');
+    const t = process.env.BOT_TOKEN || '';
+    const diag = {
+      ok: true,
+      env: {
+        BOT_TOKEN_present: !!t,
+        BOT_TOKEN_len: t.length,
+        BOT_TOKEN_head: t.slice(0, 10),
+        BOT_TOKEN_tail: t.slice(-4),
+        SITE_URL: process.env.SITE_URL || null,
+        UPSTASH_URL_present: !!process.env.UPSTASH_REDIS_REST_URL,
+        UPSTASH_TOKEN_present: !!process.env.UPSTASH_REDIS_REST_TOKEN,
+      },
+    };
+    try {
+      const me = await bot.api.getMe();
+      diag.getMe = { ok: true, username: me.username };
+    } catch (e) {
+      diag.getMe = { ok: false, error: e?.message };
+    }
+    res.status(200).json(diag);
     return;
   }
 
-  // Читаем тело вручную из потока (Vercel не парсит автоматически).
+  // POST — обработка обновления от Telegram
   let raw = '';
   for await (const chunk of req) raw += chunk;
 
@@ -33,7 +53,7 @@ export default async function handler(req, res) {
   try {
     update = JSON.parse(raw);
   } catch (e) {
-    console.error('[webhook] JSON parse error:', e?.message, '| body:', raw.slice(0, 80));
+    console.error('[webhook] JSON parse error:', e?.message);
     res.status(200).json({ ok: false, error: 'json_parse' });
     return;
   }
