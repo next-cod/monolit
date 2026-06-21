@@ -84,7 +84,12 @@ async function sendWelcome(ctx) {
   const name = ctx.from?.first_name || '';
   const src = await getBanner();
   if (src) {
-    await ctx.replyWithPhoto(src, { caption: WELCOME(name), parse_mode: 'HTML', reply_markup: siteButton() });
+    try {
+      await ctx.replyWithPhoto(src, { caption: WELCOME(name), parse_mode: 'HTML', reply_markup: siteButton() });
+    } catch {
+      // Фото не прошло — отправляем текст
+      await ctx.reply(WELCOME(name), { ...SEND_OPTS, reply_markup: siteButton() });
+    }
   } else {
     await ctx.reply(WELCOME(name), { ...SEND_OPTS, reply_markup: siteButton() });
   }
