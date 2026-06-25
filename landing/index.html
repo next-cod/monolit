@@ -17,10 +17,30 @@
   body { margin: 0; }
   @keyframes mono-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
   @keyframes mono-bob { 0%, 100% { transform: translateY(-3px); } 50% { transform: translateY(4px); } }
+  /* ---- custom scrollbar (под кремово-оранжевую тему сайта) ---- */
+  html { color-scheme: light; scrollbar-width: thin; scrollbar-color: #C9C3B8 #EDEBE5; }
+  ::-webkit-scrollbar { width: 13px; height: 13px; }
+  ::-webkit-scrollbar-track { background: #EDEBE5; }
+  ::-webkit-scrollbar-thumb { background: #C9C3B8; border-radius: 20px; border: 3px solid #EDEBE5; }
+  ::-webkit-scrollbar-thumb:hover { background: #C4622D; }
+  /* ---- карточки процесса: оранжевый акцент тянется + карточка приподнимается ---- */
+  [data-proc] { transition: transform .45s cubic-bezier(.2,.7,.2,1); }
+  [data-proc] .proc-bar { transition: width .5s cubic-bezier(.2,.7,.2,1); }
+  [data-proc] .proc-title { transition: color .3s ease; }
+  @media (hover: hover) {
+    [data-proc]:hover { transform: translateY(-8px); }
+    [data-proc]:hover .proc-bar { width: 100%; }
+    [data-proc]:hover .proc-title { color: #C4622D; }
+  }
   /* ---- email: never let the unbreakable token overflow ---- */
   [data-mail] { word-break: break-word; overflow-wrap: anywhere; max-width: 100%; }
   @media (min-width: 761px) {
     [data-mail] { font-size: clamp(40px, 6vw, 92px) !important; }
+  }
+
+  /* ---- большие экраны: контент в центрированной колонке (фон секций остаётся во всю ширину) ---- */
+  @media (min-width: 1872px) {
+    [data-pad] { padding-left: calc((100% - 1760px) / 2) !important; padding-right: calc((100% - 1760px) / 2) !important; }
   }
 
   /* ---- tablets & laptops down ---- */
@@ -49,7 +69,7 @@
     /* vertical rhythm + breathing room so the hero never feels cramped */
     #top { padding-top: 96px !important; padding-bottom: 44px !important; min-height: auto !important; gap: 38px !important; justify-content: flex-start !important; }
     /* smaller, quieter eyebrow row */
-    #top > div:first-of-type span { font-size: 11px !important; letter-spacing: 0.14em !important; }
+    #top > div:first-of-type span { font-size: 13px !important; letter-spacing: 0.01em !important; }
     #about, #works { padding-top: 72px !important; padding-bottom: 72px !important; }
     #services, #process { padding-top: 32px !important; padding-bottom: 72px !important; }
     #contact { padding-top: 80px !important; padding-bottom: 80px !important; }
@@ -89,7 +109,7 @@
     [data-hero-title] { font-size: clamp(30px, 9vw, 40px) !important; }
     [data-nav-links] a[href='#process'], [data-nav-links] a[href='#works'] { display: none !important; }
     #top > div:first-of-type { flex-direction: column !important; align-items: flex-start !important; gap: 6px !important; }
-    #top > div:first-of-type span { font-size: 10px !important; letter-spacing: 0.13em !important; text-align: left !important; }
+    #top > div:first-of-type span { font-size: 12px !important; letter-spacing: 0.01em !important; text-align: left !important; }
   }
 
   /* ---- touch devices: reveal hover-only content + hide scroll hint regardless of width ---- */
@@ -110,7 +130,7 @@
   <div data-cursor-ring style="position:fixed; left:0; top:0; width:42px; height:42px; border:1px solid #141414; border-radius:50%; pointer-events:none; z-index:9999; transition:width .25s cubic-bezier(.2,.7,.2,1),height .25s cubic-bezier(.2,.7,.2,1),background-color .25s,border-color .25s,opacity .3s; mix-blend-mode:normal; will-change:transform; opacity:0; transform:translate3d(-100px,-100px,0) translate(-50%,-50%);"></div>
   <div data-cursor-dot style="position:fixed; left:0; top:0; width:6px; height:6px; background:#C4622D; border-radius:50%; pointer-events:none; z-index:9999; will-change:transform; opacity:0; transform:translate3d(-100px,-100px,0) translate(-50%,-50%);"></div>
 
-  <nav data-nav data-pad style="position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; height:64px; padding:0 56px; border-bottom:1px solid transparent; background:rgba(247,246,242,0); transition:background-color .4s ease, backdrop-filter .4s ease, border-color .4s ease;">
+  <nav data-nav data-pad style="position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; height:64px; padding:0 56px; border-bottom:1px solid #E8E6E0; background:#F7F6F2; transition:border-color .4s ease, box-shadow .4s ease;">
     <a href="#top" data-hover style="font-family:'Playfair Display',serif; font-weight:600; font-size:22px; letter-spacing:-0.02em; color:#141414; text-decoration:none;">Монолит<span style="color:#C4622D;">.</span></a>
     <div data-nav-links style="display:flex; align-items:center; gap:34px;">
       <a href="#about" data-hover style="font-size:14px; font-weight:500; color:#141414; text-decoration:none; letter-spacing:0.01em;">Студия</a>
@@ -123,8 +143,8 @@
 
   <section id="top" data-pad style="min-height:100vh; padding:120px 56px 40px; display:flex; flex-direction:column; justify-content:space-between; position:relative;">
     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-      <span data-fade style="font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; letter-spacing:0.18em; text-transform:uppercase; color:#7A756B;">(01) – Студия бренд-стратегии</span>
-      <span data-fade data-delay="120" style="font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; letter-spacing:0.18em; text-transform:uppercase; color:#7A756B; text-align:right;">Москва · с 2016</span>
+      <span data-fade style="font-family:'DM Sans',sans-serif; font-size:16px; font-weight:500; letter-spacing:0.01em; color:#7A756B;">Студия бренд-стратегии</span>
+      <span data-fade data-delay="120" style="font-family:'DM Sans',sans-serif; font-size:16px; font-weight:500; letter-spacing:0.01em; color:#7A756B; text-align:right;">Москва · с 2016</span>
     </div>
 
     <div style="position:relative;">
@@ -140,7 +160,7 @@
         <span style="display:inline-flex; align-items:center; justify-content:center; width:46px; height:46px; border:1px solid #141414; border-radius:50%; flex:0 0 auto; overflow:hidden;">
           <span style="font-size:17px; line-height:1; animation:mono-bob 1.8s ease-in-out infinite;">&#8595;</span>
         </span>
-        <span style="font-size:11px; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:#141414;">Прокрутите вниз</span>
+        <span style="font-size:12px; font-weight:500; letter-spacing:0.03em; color:#141414;">Прокрутите вниз</span>
       </div>
       <p data-fade data-delay="200" style="margin:0; max-width:300px; text-align:right; font-size:15px; line-height:1.6; color:#141414;">Стратегия, нейминг и позиционирование для брендов, которым есть что сказать – и хватает выдержки сказать это коротко.</p>
     </div>
@@ -151,7 +171,6 @@
   <section id="about" data-pad style="padding:120px 56px; scroll-margin-top:64px;">
     <div data-about-grid style="display:flex; gap:80px; align-items:flex-start;">
       <div style="flex:1 1 0; min-width:300px; max-width:680px;">
-        <span data-fade style="display:block; font-size:12px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:#7A756B; margin-bottom:32px;">(02) Студия</span>
         <h2 data-fade data-delay="80" style="margin:0 0 36px; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(38px,5.5vw,68px); line-height:1.02; letter-spacing:-0.025em;">Меньше слов.<br>Больше смысла.</h2>
         <p data-fade data-delay="140" style="margin:0 0 22px; font-size:17px; line-height:1.65; max-width:560px;">Монолит – независимая студия бренд-стратегии. Мы работаем с теми, кто готов отказаться от лишнего: ресторанами, модными домами, архитектурными бюро, девелоперами и розничными сетями.</p>
         <p data-fade data-delay="200" style="margin:0; font-size:17px; line-height:1.65; max-width:560px;">Мы не украшаем. Мы решаем, что бренд значит, как он звучит и почему его выбирают. Всё остальное – следствие этого решения.</p>
@@ -159,7 +178,7 @@
       <div data-about-shape data-fade data-delay="160" style="flex:0 0 40%; width:40%; min-width:300px;">
         <div style="border:1.5px solid #141414; background:#FFFFFF;">
           <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 24px; border-bottom:1.5px solid #141414;">
-            <span style="font-size:11px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:#7A756B;">Студия в цифрах</span>
+            <span style="font-size:12px; font-weight:600; letter-spacing:0.01em; color:#7A756B;">Студия в цифрах</span>
             <span style="width:16px; height:16px; background:#C4622D; display:inline-block;"></span>
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr;">
@@ -186,36 +205,31 @@
   </section>
 
   <section id="services" data-pad style="padding:40px 56px 120px; scroll-margin-top:64px;">
-    <span data-fade style="display:block; font-size:12px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:#7A756B; margin-bottom:14px;">(03) Услуги</span>
+    <span data-fade style="display:block; font-size:14px; font-weight:500; letter-spacing:0.02em; color:#7A756B; margin-bottom:16px;">Услуги</span>
     <div style="border-top:1px solid #141414;">
 
       <div data-service-row data-service data-hover style="position:relative; display:flex; align-items:baseline; gap:32px; padding:34px 0; border-bottom:1px solid #DEDCD5; cursor:default; transition:color .3s ease;">
-        <span data-num style="font-family:'Playfair Display',serif; font-size:22px; font-weight:500; width:54px; flex:0 0 54px; color:#C4622D;">01</span>
-        <h3 style="margin:0; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(30px,4.5vw,56px); line-height:1; letter-spacing:-0.02em; flex:0 0 auto;">Стратегия бренда</h3>
+        <h3 style="margin:0; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(30px,4.5vw,56px); line-height:1; letter-spacing:-0.02em;">Стратегия бренда</h3>
         <p data-desc style="position:absolute; right:0; bottom:38px; margin:0; max-width:360px; text-align:right; font-size:15px; line-height:1.55; color:#141414; opacity:0; transform:translateX(-24px); transition:opacity .4s ease, transform .4s ease; pointer-events:none;">Платформа бренда, ценности, тон голоса. Фундамент, на котором держится всё остальное.</p>
       </div>
 
       <div data-service-row data-service data-hover style="position:relative; display:flex; align-items:baseline; gap:32px; padding:34px 0; border-bottom:1px solid #DEDCD5; cursor:default; transition:color .3s ease;">
-        <span data-num style="font-family:'Playfair Display',serif; font-size:22px; font-weight:500; width:54px; flex:0 0 54px; color:#C4622D;">02</span>
-        <h3 style="margin:0; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(30px,4.5vw,56px); line-height:1; letter-spacing:-0.02em; flex:0 0 auto;">Нейминг</h3>
+        <h3 style="margin:0; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(30px,4.5vw,56px); line-height:1; letter-spacing:-0.02em;">Нейминг</h3>
         <p data-desc style="position:absolute; right:0; bottom:38px; margin:0; max-width:360px; text-align:right; font-size:15px; line-height:1.55; color:#141414; opacity:0; transform:translateX(-24px); transition:opacity .4s ease, transform .4s ease; pointer-events:none;">Имена для компаний, продуктов и линеек. Слово, которое работает на вас, а не против.</p>
       </div>
 
       <div data-service-row data-service data-hover style="position:relative; display:flex; align-items:baseline; gap:32px; padding:34px 0; border-bottom:1px solid #DEDCD5; cursor:default; transition:color .3s ease;">
-        <span data-num style="font-family:'Playfair Display',serif; font-size:22px; font-weight:500; width:54px; flex:0 0 54px; color:#C4622D;">03</span>
-        <h3 style="margin:0; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(30px,4.5vw,56px); line-height:1; letter-spacing:-0.02em; flex:0 0 auto;">Визуальная идентичность</h3>
+        <h3 style="margin:0; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(30px,4.5vw,56px); line-height:1; letter-spacing:-0.02em;">Визуальная идентичность</h3>
         <p data-desc style="position:absolute; right:0; bottom:38px; margin:0; max-width:360px; text-align:right; font-size:15px; line-height:1.55; color:#141414; opacity:0; transform:translateX(-24px); transition:opacity .4s ease, transform .4s ease; pointer-events:none;">Знак, типографика, система. Визуальный язык, который узнают без подписи.</p>
       </div>
 
       <div data-service-row data-service data-hover style="position:relative; display:flex; align-items:baseline; gap:32px; padding:34px 0; border-bottom:1px solid #DEDCD5; cursor:default; transition:color .3s ease;">
-        <span data-num style="font-family:'Playfair Display',serif; font-size:22px; font-weight:500; width:54px; flex:0 0 54px; color:#C4622D;">04</span>
-        <h3 style="margin:0; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(30px,4.5vw,56px); line-height:1; letter-spacing:-0.02em; flex:0 0 auto;">Позиционирование</h3>
+        <h3 style="margin:0; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(30px,4.5vw,56px); line-height:1; letter-spacing:-0.02em;">Позиционирование</h3>
         <p data-desc style="position:absolute; right:0; bottom:38px; margin:0; max-width:360px; text-align:right; font-size:15px; line-height:1.55; color:#141414; opacity:0; transform:translateX(-24px); transition:opacity .4s ease, transform .4s ease; pointer-events:none;">Место в голове клиента. Чёткая разница между вами и всеми остальными.</p>
       </div>
 
       <div data-service-row data-service data-hover style="position:relative; display:flex; align-items:baseline; gap:32px; padding:34px 0; border-bottom:1px solid #141414; cursor:default; transition:color .3s ease;">
-        <span data-num style="font-family:'Playfair Display',serif; font-size:22px; font-weight:500; width:54px; flex:0 0 54px; color:#C4622D;">05</span>
-        <h3 style="margin:0; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(30px,4.5vw,56px); line-height:1; letter-spacing:-0.02em; flex:0 0 auto;">Брендбук и гайдлайны</h3>
+        <h3 style="margin:0; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(30px,4.5vw,56px); line-height:1; letter-spacing:-0.02em;">Брендбук и гайдлайны</h3>
         <p data-desc style="position:absolute; right:0; bottom:38px; margin:0; max-width:360px; text-align:right; font-size:15px; line-height:1.55; color:#141414; opacity:0; transform:translateX(-24px); transition:opacity .4s ease, transform .4s ease; pointer-events:none;">Правила игры на бумаге. Чтобы бренд оставался собой в любых руках.</p>
       </div>
 
@@ -223,27 +237,30 @@
   </section>
 
   <section id="process" data-pad style="padding:40px 56px 120px; scroll-margin-top:64px;">
-    <span data-fade style="display:block; font-size:12px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:#7A756B; margin-bottom:14px;">(04) Процесс</span>
     <h2 data-fade data-delay="60" style="margin:0 0 56px; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(38px,5.5vw,68px); line-height:1.02; letter-spacing:-0.025em;">Как мы работаем</h2>
     <div data-process-grid style="display:grid; grid-template-columns:repeat(4,1fr); gap:40px;">
-      <div data-fade style="border-top:1.5px solid #141414; padding-top:24px;">
-        <span style="font-family:'Playfair Display',serif; font-weight:500; font-size:24px; color:#C4622D;">01</span>
-        <h3 style="margin:18px 0 14px; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(22px,2.4vw,30px); line-height:1.1; letter-spacing:-0.02em;">Погружение</h3>
+      <div data-fade data-proc style="position:relative; padding-top:26px;">
+        <span style="position:absolute; top:0; left:0; right:0; height:1.5px; background:#D6D2C8;"></span>
+        <span class="proc-bar" style="position:absolute; top:0; left:0; width:25%; height:1.5px; background:#C4622D; z-index:1;"></span>
+        <h3 class="proc-title" style="margin:0 0 12px; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(22px,2.4vw,30px); line-height:1.1; letter-spacing:-0.02em;">Погружение</h3>
         <p style="margin:0; font-size:15px; line-height:1.6; color:#4A463F;">Изучаем рынок, аудиторию и то, что вы уже построили. Слушаем больше, чем говорим.</p>
       </div>
-      <div data-fade data-delay="80" style="border-top:1.5px solid #141414; padding-top:24px;">
-        <span style="font-family:'Playfair Display',serif; font-weight:500; font-size:24px; color:#C4622D;">02</span>
-        <h3 style="margin:18px 0 14px; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(22px,2.4vw,30px); line-height:1.1; letter-spacing:-0.02em;">Стратегия</h3>
+      <div data-fade data-delay="80" data-proc style="position:relative; padding-top:26px;">
+        <span style="position:absolute; top:0; left:0; right:0; height:1.5px; background:#D6D2C8;"></span>
+        <span class="proc-bar" style="position:absolute; top:0; left:0; width:50%; height:1.5px; background:#C4622D; z-index:1;"></span>
+        <h3 class="proc-title" style="margin:0 0 12px; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(22px,2.4vw,30px); line-height:1.1; letter-spacing:-0.02em;">Стратегия</h3>
         <p style="margin:0; font-size:15px; line-height:1.6; color:#4A463F;">Формулируем суть: что бренд значит, как звучит и почему выбирают именно его.</p>
       </div>
-      <div data-fade data-delay="160" style="border-top:1.5px solid #141414; padding-top:24px;">
-        <span style="font-family:'Playfair Display',serif; font-weight:500; font-size:24px; color:#C4622D;">03</span>
-        <h3 style="margin:18px 0 14px; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(22px,2.4vw,30px); line-height:1.1; letter-spacing:-0.02em;">Воплощение</h3>
+      <div data-fade data-delay="160" data-proc style="position:relative; padding-top:26px;">
+        <span style="position:absolute; top:0; left:0; right:0; height:1.5px; background:#D6D2C8;"></span>
+        <span class="proc-bar" style="position:absolute; top:0; left:0; width:75%; height:1.5px; background:#C4622D; z-index:1;"></span>
+        <h3 class="proc-title" style="margin:0 0 12px; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(22px,2.4vw,30px); line-height:1.1; letter-spacing:-0.02em;">Воплощение</h3>
         <p style="margin:0; font-size:15px; line-height:1.6; color:#4A463F;">Превращаем стратегию в имя, язык и визуальную систему – без лишних деталей.</p>
       </div>
-      <div data-fade data-delay="240" style="border-top:1.5px solid #141414; padding-top:24px;">
-        <span style="font-family:'Playfair Display',serif; font-weight:500; font-size:24px; color:#C4622D;">04</span>
-        <h3 style="margin:18px 0 14px; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(22px,2.4vw,30px); line-height:1.1; letter-spacing:-0.02em;">Передача</h3>
+      <div data-fade data-delay="240" data-proc style="position:relative; padding-top:26px;">
+        <span style="position:absolute; top:0; left:0; right:0; height:1.5px; background:#D6D2C8;"></span>
+        <span class="proc-bar" style="position:absolute; top:0; left:0; width:100%; height:1.5px; background:#C4622D; z-index:1;"></span>
+        <h3 class="proc-title" style="margin:0 0 12px; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(22px,2.4vw,30px); line-height:1.1; letter-spacing:-0.02em;">Передача</h3>
         <p style="margin:0; font-size:15px; line-height:1.6; color:#4A463F;">Отдаём бренд с правилами, по которым он останется собой в любых руках.</p>
       </div>
     </div>
@@ -252,7 +269,6 @@
   <section id="works" data-pad style="position:relative; padding:120px 56px; scroll-margin-top:64px; overflow:hidden;">
     <span aria-hidden="true" style="position:absolute; top:24px; right:-80px; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(120px,26vw,360px); line-height:0.8; letter-spacing:-0.04em; color:transparent; -webkit-text-stroke:1px rgba(20,20,20,0.09); white-space:nowrap; pointer-events:none; z-index:0;">Избранное</span>
     <div data-pad-inner style="position:relative; z-index:1; padding:0;">
-      <span data-fade style="display:block; font-size:12px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:#7A756B; margin-bottom:14px;">(05) Работы</span>
       <h2 data-fade data-delay="60" style="margin:0 0 48px; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(38px,5.5vw,68px); line-height:1; letter-spacing:-0.025em;">Избранные работы</h2>
 
       <div style="border-top:1px solid #141414;">
@@ -260,31 +276,31 @@
           <span class="work-name" style="font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(24px,3vw,36px); letter-spacing:-0.02em; transition:color .3s ease;">Соль</span>
           <span data-work-meta style="font-size:15px; color:#141414;">Ресторанная группа</span>
           <span data-work-meta style="font-size:15px; color:#7A756B;">2025</span>
-          <span data-work-meta style="font-size:13px; font-weight:500; letter-spacing:0.04em; text-transform:uppercase; color:#7A756B;">Нейминг, Идентичность</span>
+          <span data-work-meta style="font-size:13px; font-weight:500; letter-spacing:0.02em; color:#7A756B;">Нейминг, идентичность</span>
         </div>
         <div data-work-row data-work data-hover style="display:grid; grid-template-columns:1.4fr 1.4fr 0.5fr 1.2fr; align-items:baseline; gap:24px; padding:30px 0; border-bottom:1px solid #DEDCD5; transition:padding-left .35s ease, color .3s ease;">
           <span class="work-name" style="font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(24px,3vw,36px); letter-spacing:-0.02em; transition:color .3s ease;">Грань</span>
           <span data-work-meta style="font-size:15px; color:#141414;">Архитектурное бюро</span>
           <span data-work-meta style="font-size:15px; color:#7A756B;">2024</span>
-          <span data-work-meta style="font-size:13px; font-weight:500; letter-spacing:0.04em; text-transform:uppercase; color:#7A756B;">Позиционирование</span>
+          <span data-work-meta style="font-size:13px; font-weight:500; letter-spacing:0.02em; color:#7A756B;">Позиционирование</span>
         </div>
         <div data-work-row data-work data-hover style="display:grid; grid-template-columns:1.4fr 1.4fr 0.5fr 1.2fr; align-items:baseline; gap:24px; padding:30px 0; border-bottom:1px solid #DEDCD5; transition:padding-left .35s ease, color .3s ease;">
           <span class="work-name" style="font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(24px,3vw,36px); letter-spacing:-0.02em; transition:color .3s ease;">Крой</span>
           <span data-work-meta style="font-size:15px; color:#141414;">Модный дом</span>
           <span data-work-meta style="font-size:15px; color:#7A756B;">2024</span>
-          <span data-work-meta style="font-size:13px; font-weight:500; letter-spacing:0.04em; text-transform:uppercase; color:#7A756B;">Стратегия, Нейминг</span>
+          <span data-work-meta style="font-size:13px; font-weight:500; letter-spacing:0.02em; color:#7A756B;">Стратегия, нейминг</span>
         </div>
         <div data-work-row data-work data-hover style="display:grid; grid-template-columns:1.4fr 1.4fr 0.5fr 1.2fr; align-items:baseline; gap:24px; padding:30px 0; border-bottom:1px solid #DEDCD5; transition:padding-left .35s ease, color .3s ease;">
           <span class="work-name" style="font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(24px,3vw,36px); letter-spacing:-0.02em; transition:color .3s ease;">Контур</span>
           <span data-work-meta style="font-size:15px; color:#141414;">Сеть магазинов</span>
           <span data-work-meta style="font-size:15px; color:#7A756B;">2023</span>
-          <span data-work-meta style="font-size:13px; font-weight:500; letter-spacing:0.04em; text-transform:uppercase; color:#7A756B;">Бренд-платформа</span>
+          <span data-work-meta style="font-size:13px; font-weight:500; letter-spacing:0.02em; color:#7A756B;">Бренд-платформа</span>
         </div>
         <div data-work-row data-work data-hover style="display:grid; grid-template-columns:1.4fr 1.4fr 0.5fr 1.2fr; align-items:baseline; gap:24px; padding:30px 0; border-bottom:1px solid #141414; transition:padding-left .35s ease, color .3s ease;">
           <span class="work-name" style="font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(24px,3vw,36px); letter-spacing:-0.02em; transition:color .3s ease;">Север</span>
           <span data-work-meta style="font-size:15px; color:#141414;">Девелопмент</span>
           <span data-work-meta style="font-size:15px; color:#7A756B;">2023</span>
-          <span data-work-meta style="font-size:13px; font-weight:500; letter-spacing:0.04em; text-transform:uppercase; color:#7A756B;">Идентичность</span>
+          <span data-work-meta style="font-size:13px; font-weight:500; letter-spacing:0.02em; color:#7A756B;">Идентичность</span>
         </div>
       </div>
     </div>
@@ -295,11 +311,10 @@
   </section>
 
   <section id="contact" data-pad style="padding:130px 56px; scroll-margin-top:64px;">
-    <span data-fade style="display:block; font-size:12px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:#7A756B; margin-bottom:28px;">(06) Контакт</span>
     <p data-fade data-delay="60" style="margin:0 0 36px; font-size:18px; line-height:1.5; max-width:520px;">Расскажите, что вы строите. Мы ответим, стоит ли это называть как-то иначе.</p>
     <a href="mailto:monolitmoscow@gmail.com" data-hover data-mail style="display:inline-block; font-family:'Playfair Display',serif; font-weight:500; font-size:clamp(34px,7.6vw,118px); line-height:1; letter-spacing:-0.035em; color:#141414; text-decoration:none; transition:color .3s ease;">monolitmoscow@gmail.com</a>
     <div style="margin-top:48px;">
-      <a href="mailto:monolitmoscow@gmail.com" data-hover data-cta style="display:inline-flex; align-items:center; gap:14px; padding:18px 0; border-top:1px solid #141414; border-bottom:1px solid #141414; font-size:14px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:#141414; text-decoration:none; transition:gap .3s ease, color .3s ease;">Написать письмо <span data-cta-arrow style="font-family:'DM Sans',sans-serif; transition:transform .3s ease;">&#8594;</span></a>
+      <a href="mailto:monolitmoscow@gmail.com" data-hover data-cta style="display:inline-flex; align-items:center; gap:14px; padding:18px 0; border-top:1px solid #141414; border-bottom:1px solid #141414; font-size:14px; font-weight:600; letter-spacing:0.03em; color:#141414; text-decoration:none; transition:gap .3s ease, color .3s ease;">Написать письмо <span data-cta-arrow style="font-family:'DM Sans',sans-serif; transition:transform .3s ease;">&#8594;</span></a>
     </div>
   </section>
 
@@ -311,7 +326,7 @@
       </div>
       <div style="display:flex; gap:64px; flex-wrap:wrap;">
         <div>
-          <div style="font-size:11px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:rgba(247,246,242,0.4); margin-bottom:20px;">Навигация</div>
+          <div style="font-size:12px; font-weight:600; letter-spacing:0.02em; color:rgba(247,246,242,0.55); margin-bottom:20px;">Навигация</div>
           <div style="display:flex; flex-direction:column; gap:13px;">
             <a href="#about" data-hover style="font-size:15px; color:#F7F6F2; text-decoration:none;">Студия</a>
             <a href="#services" data-hover style="font-size:15px; color:#F7F6F2; text-decoration:none;">Услуги</a>
@@ -320,7 +335,7 @@
           </div>
         </div>
         <div>
-          <div style="font-size:11px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:rgba(247,246,242,0.4); margin-bottom:20px;">Контакты</div>
+          <div style="font-size:12px; font-weight:600; letter-spacing:0.02em; color:rgba(247,246,242,0.55); margin-bottom:20px;">Контакты</div>
           <div style="display:flex; flex-direction:column; gap:13px;">
             <a href="mailto:monolitmoscow@gmail.com" data-hover style="font-size:15px; color:#F7F6F2; text-decoration:none;">monolitmoscow@gmail.com</a>
             <a href="tel:+79034821967" data-hover style="font-size:15px; color:#F7F6F2; text-decoration:none;">+7 903 482-19-67</a>
@@ -328,7 +343,7 @@
           </div>
         </div>
         <div>
-          <div style="font-size:11px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:rgba(247,246,242,0.4); margin-bottom:20px;">Соцсети</div>
+          <div style="font-size:12px; font-weight:600; letter-spacing:0.02em; color:rgba(247,246,242,0.55); margin-bottom:20px;">Соцсети</div>
           <div style="display:flex; flex-direction:column; gap:13px;">
             <a href="#" data-hover style="font-size:15px; color:#F7F6F2; text-decoration:none;">Telegram</a>
             <a href="#" data-hover style="font-size:15px; color:#F7F6F2; text-decoration:none;">Behance</a>
@@ -342,7 +357,7 @@
     </div>
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; padding-top:28px;">
       <p style="margin:0; font-size:13px; color:rgba(247,246,242,0.5); letter-spacing:0.03em;">© 2026 Монолит · Студия бренд-стратегии · Москва, с 2016</p>
-      <a href="#top" data-hover style="display:inline-flex; align-items:center; gap:10px; font-size:13px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:#F7F6F2; text-decoration:none;">Наверх <span style="font-family:'DM Sans',sans-serif;">&#8593;</span></a>
+      <a href="#top" data-hover style="display:inline-flex; align-items:center; gap:10px; font-size:13px; font-weight:600; letter-spacing:0.03em; color:#F7F6F2; text-decoration:none;">Наверх <span style="font-family:'DM Sans',sans-serif;">&#8593;</span></a>
     </div>
   </footer>
 
@@ -480,15 +495,11 @@ class Component extends DCLogic {
     if (nav) {
       const onScroll = () => {
         if (window.scrollY > 40) {
-          nav.style.background = 'rgba(247,246,242,0.72)';
-          nav.style.backdropFilter = 'blur(12px)';
-          nav.style.webkitBackdropFilter = 'blur(12px)';
           nav.style.borderColor = '#DEDCD5';
+          nav.style.boxShadow = '0 1px 12px rgba(20,20,20,0.05)';
         } else {
-          nav.style.background = 'rgba(247,246,242,0)';
-          nav.style.backdropFilter = 'none';
-          nav.style.webkitBackdropFilter = 'none';
-          nav.style.borderColor = 'transparent';
+          nav.style.borderColor = '#E8E6E0';
+          nav.style.boxShadow = 'none';
         }
       };
       window.addEventListener('scroll', onScroll, { passive: true });
